@@ -5,7 +5,10 @@ def get_cache_key(page, language):
     """
     Create the cache key for the current page and language
     """
-    from cms.templatetags.cms_tags import _get_cache_key
+    try:
+        from cms.cache import _get_cache_key
+    except ImportError:
+        from cms.templatetags.cms_tags import _get_cache_key
     site_id = page.site_id
     return _get_cache_key('page_meta', page, language, site_id)
 
@@ -23,6 +26,9 @@ def get_page_meta(page, language):
     from django.core.cache import cache
     from meta.views import Meta
     from .models import PageMeta, TitleMeta
+
+    if page is None:
+        return None
 
     meta_key = get_cache_key(page, language)
     meta = cache.get(meta_key)
